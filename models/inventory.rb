@@ -1,0 +1,20 @@
+# frozen_string_literal: true
+
+require_relative 'item'
+
+# Represents the collection of items available in the system.
+class Inventory
+  attr_reader :items
+
+  def initialize
+    @items = {
+      'ITEM001' => Item.new('ITEM001', { name: 'Super Widget', price: 19.99, stock: 10 }),
+      'ITEM002' => Item.new('ITEM002', { name: 'Mega Gadget', price: 29.99, stock: 5 }),
+      'ITEM003' => Item.new('ITEM003', { name: 'Basic Thingamajig', price: 9.99, stock: 20 })
+    }
+  end
+
+  def to_s
+    items.map { |id, item_object| "  #{id}: #{item_object}" }.join("\n")
+  end
+end
