@@ -1,3 +1,6 @@
+# frozen_string_literal: true
+
+# Represents a credit card.
 class Card
   attr_reader :number, :expiry_date, :cvv
 
@@ -8,14 +11,10 @@ class Card
   end
 
   def to_s
-    "Card -> #{mask_number}"
+    last_four_digits
   end
 
   private
-
-  def mask_number
-    "#### #### #### #{last_four_digits}"
-  end
 
   def last_four_digits
     @number[-4..]

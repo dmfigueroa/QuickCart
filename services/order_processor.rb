@@ -2,7 +2,8 @@
 
 require 'uri'
 require_relative '../models/cart'
-
+require_relative 'customer_validator'
+require_relative 'payment_processor'
 # Processes customer orders, manages items, calculates totals, and handles payment.
 class OrderProcessor
   attr_reader :customer, :status, :inventory
@@ -25,52 +26,19 @@ class OrderProcessor
     puts "Error: #{e.message}"
   end
 
-  def validate_customer_details
-    # Basic validation
-    if @customer.name.nil? || @customer.name.strip.empty?
-      puts 'Error: Customer name is required.'
-      return false
-    end
-    unless @customer.email =~ URI::MailTo::EMAIL_REGEXP
-      puts 'Error: Invalid customer email format.'
-      return false
-    end
-    if @customer.address.nil? || @customer.address.strip.empty?
-      puts 'Error: Customer address is required.'
-      return false
-    end
-    puts "Customer details validated for order #{order_id}."
+  def complete_order(card)
+    validate_order(card)
+
+    @status = :paid
+    puts "Payment SUCCEEDED for order #{order_id}. Amount: $#{'%.2f' % @cart.total}."
+    update_inventory
+    generate_order_summary
+    send_confirmation_email
+
     true
-  end
-
-  def process_payment(card)
-    unless validate_customer_details
-      @status = :validation_failed
-      puts "Payment processing aborted due to validation errors for order #{order_id}."
-      return false
-    end
-
-    if @cart.empty?
-      puts "Error: Cannot process payment for an empty order (#{order_id})."
-      return false
-    end
-
-    # Simulate credit card payment processing
-    puts "Processing payment for order #{order_id} with card ending in #{card}..."
-    sleep 1 # Simulate network latency
-
-    if card.number == 'INVALID_CARD_NUMBER' # Simulate a failed payment
-      @status = :payment_failed
-      puts "Payment FAILED for order #{order_id}."
-      false
-    else
-      @status = :paid
-      puts "Payment SUCCEEDED for order #{order_id}. Amount: $#{'%.2f' % @cart.total}."
-      update_inventory
-      generate_order_summary
-      send_confirmation_email
-      true
-    end
+  rescue StandardError => e
+    puts "Payment failed: #{e.message}"
+    false
   end
 
   def generate_order_summary
@@ -133,5 +101,38 @@ class OrderProcessor
     end
 
     true
+  end
+
+  def validate_order(card)
+    validate_customer
+    validate_cart
+    validate_payment(card)
+  end
+
+  def validate_customer
+    return if valid_customer?
+
+    @status = :validation_failed
+    raise StandardError, "Aborted due to validation errors for order #{order_id}."
+  end
+
+  def valid_customer?
+    is_valid = CustomerValidator.new(customer).validate
+    puts "Customer details validated for order #{order_id}."
+
+    is_valid
+  end
+
+  def validate_cart
+    return unless @cart.empty?
+
+    raise "Cannot process payment for an empty order (#{order_id})."
+  end
+
+  def validate_payment(card)
+    PaymentProcessor.new(order_id, card).process_payment
+  rescue StandardError => e
+    @status = :payment_failed
+    raise e.message
   end
 end

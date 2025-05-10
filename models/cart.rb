@@ -31,6 +31,8 @@ class Cart
   end
 
   def to_s
-    "  - #{@items.map(&:to_s).join(', ')}"
+    @items.map do |item|
+      "  - #{item.item.name} (Code: #{item.item.id}) x #{item.quantity} @ $#{item.item.price} each"
+    end.join("\n")
   end
 end

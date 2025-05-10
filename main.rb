@@ -18,7 +18,7 @@ order1.add_item inventory.find_item('ITEM001'), 2
 order1.add_item inventory.find_item('ITEM003'), 1
 
 card1 = Card.new '1234567890123456', '12/25', '123'
-if order1.process_payment(card1)
+if order1.complete_order card1
   puts 'Order 1 processing complete.'
 else
   puts 'Order 1 processing failed.'
@@ -31,6 +31,6 @@ customer2 = Customer.new name: 'Jane Smith', email: 'jane.smith@example.com', ad
 order2 = OrderProcessor.new inventory, customer2
 order2.add_item inventory.find_item('ITEM002'), 1 # Mega Gadget
 card2 = Card.new 'INVALID_CARD_NUMBER', '01/24', '456'
-order2.process_payment card2 # This will fail
+order2.complete_order card2 # This will fail
 
 puts "\nFinal Inventory: \n#{inventory}\n\n"
