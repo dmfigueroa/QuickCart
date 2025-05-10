@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require_relative './models/inventory'
 require 'uri'
 
 # Processes customer orders, manages items, calculates totals, and handles payment.
@@ -10,21 +9,20 @@ class OrderProcessor
   def initialize(inventory, customer)
     @order_id = generate_order_id
     @customer = customer
-    @items = [] # Each item: { item_code: "ITEM001", quantity: 1, unit_price: 19.99 }
+    @items = [] # Each item: { item: product_info, quantity: quantity }
     @status = :pending
     @inventory = inventory
-    puts "Order #{@order_id} created for #{@customer_name}."
+    puts "Order #{@order_id} created for #{@customer.name}."
   end
 
-  def add_item(item_code, quantity)
+  def add_item(product_info, quantity)
     if @status != :pending && @status != :payment_failed
       puts 'Error: Cannot add items to an order that is not pending or has failed payment.'
       return false
     end
 
-    product_info = @inventory.items[item_code]
     if product_info.nil?
-      puts "Error: Item code #{item_code} not found."
+      puts "Error: Item code #{product_info.id} not found."
       return false
     end
 
@@ -33,13 +31,13 @@ class OrderProcessor
       return false
     end
 
-    @items << { item_code: item_code, quantity: quantity, unit_price: product_info.price }
+    @items << { item: product_info, quantity: quantity }
     puts "#{quantity} of #{product_info.name} added to order #{@order_id}."
     true
   end
 
   def calculate_total
-    subtotal = @items.sum { |item| item[:unit_price] * item[:quantity] }
+    subtotal = @items.sum { |item| item[:item].price * item[:quantity] }
     tax = subtotal * 0.07 # 7% sales tax
     total = subtotal + tax
     { subtotal: subtotal, tax: tax, total: total }
@@ -103,8 +101,8 @@ class OrderProcessor
     summary += "Status: #{@status}\n"
     summary += "Items:\n"
     @items.each do |item|
-      product_name = @inventory.items[item[:item_code]].name
-      summary += "  - #{product_name} (Code: #{item[:item_code]}) x #{item[:quantity]} @ $#{'%.2f' % item[:unit_price]} each\n"
+      product_name = item[:item].name
+      summary += "  - #{product_name} (Code: #{item[:item].id}) x #{item[:quantity]} @ $#{'%.2f' % item[:item].price} each\n"
     end
     totals = calculate_total
     summary += "Subtotal: $#{'%.2f' % totals[:subtotal]}\n"
@@ -136,7 +134,7 @@ class OrderProcessor
 
   def send_confirmation_email
     # Simulate sending an email
-    puts "Simulating sending confirmation email to #{@customer_email} for order #{@order_id}."
+    puts "Simulating sending confirmation email to #{@customer.email} for order #{@order_id}."
     # In a real app, this would use an email library and templates.
   end
 end

@@ -14,6 +14,10 @@ class Inventory
     }
   end
 
+  def find_item(item_code)
+    items[item_code]
+  end
+
   def to_s
     items.map { |id, item_object| "  #{id}: #{item_object}" }.join("\n")
   end
