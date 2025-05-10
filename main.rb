@@ -2,6 +2,7 @@
 
 require_relative 'models/inventory'
 require_relative 'models/customer'
+require_relative 'models/card'
 require_relative 'order_processor'
 
 puts "\n--- INITIALIZING INVENTORY ---"
@@ -18,7 +19,8 @@ order1 = OrderProcessor.new(inventory, customer1)
 order1.add_item(inventory.find_item('ITEM001'), 2)
 order1.add_item(inventory.find_item('ITEM003'), 1)
 
-if order1.process_payment('VALID_CARD_NUMBER', '12/25', '123')
+card1 = Card.new('VALID_CARD_NUMBER', '12/25', '123')
+if order1.process_payment(card1)
   puts 'Order 1 processing complete.'
 else
   puts 'Order 1 processing failed.'
@@ -37,6 +39,7 @@ puts "------------------------------\n"
 
 order2 = OrderProcessor.new(inventory, customer2)
 order2.add_item(inventory.find_item('ITEM002'), 1) # Mega Gadget
-order2.process_payment('INVALID_CARD_NUMBER', '01/24', '456') # This will fail
+card2 = Card.new('INVALID_CARD_NUMBER', '01/24', '456')
+order2.process_payment(card2) # This will fail
 
 puts "\nFinal Inventory: \n#{inventory}"

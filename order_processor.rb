@@ -12,11 +12,11 @@ class OrderProcessor
     @items = [] # Each item: { item: product_info, quantity: quantity }
     @status = :pending
     @inventory = inventory
-    puts "Order #{@order_id} created for #{@customer.name}."
+    puts "Order #{order_id} created for #{@customer.name}."
   end
 
   def add_item(product_info, quantity)
-    if @status != :pending && @status != :payment_failed
+    if status != :pending && status != :payment_failed
       puts 'Error: Cannot add items to an order that is not pending or has failed payment.'
       return false
     end
@@ -32,7 +32,7 @@ class OrderProcessor
     end
 
     @items << { item: product_info, quantity: quantity }
-    puts "#{quantity} of #{product_info.name} added to order #{@order_id}."
+    puts "#{quantity} of #{product_info.name} added to order #{order_id}."
     true
   end
 
@@ -57,34 +57,34 @@ class OrderProcessor
       puts 'Error: Customer address is required.'
       return false
     end
-    puts "Customer details validated for order #{@order_id}."
+    puts "Customer details validated for order #{order_id}."
     true
   end
 
-  def process_payment(card_number, _expiry_date, _cvv)
+  def process_payment(card)
     unless validate_customer_details
       @status = :validation_failed
-      puts "Payment processing aborted due to validation errors for order #{@order_id}."
+      puts "Payment processing aborted due to validation errors for order #{order_id}."
       return false
     end
 
     if @items.empty?
-      puts "Error: Cannot process payment for an empty order (#{@order_id})."
+      puts "Error: Cannot process payment for an empty order (#{order_id})."
       return false
     end
 
     # Simulate credit card payment processing
-    puts "Processing payment for order #{@order_id} with card ending in #{card_number[-4..]}..."
+    puts "Processing payment for order #{order_id} with card ending in #{card}..."
     sleep 1 # Simulate network latency
 
-    if card_number == 'INVALID_CARD_NUMBER' # Simulate a failed payment
+    if card.number == 'INVALID_CARD_NUMBER' # Simulate a failed payment
       @status = :payment_failed
-      puts "Payment FAILED for order #{@order_id}."
+      puts "Payment FAILED for order #{order_id}."
       false
     else
       @status = :paid
       order_totals = calculate_total
-      puts "Payment SUCCEEDED for order #{@order_id}. Amount: $#{'%.2f' % order_totals[:total]}."
+      puts "Payment SUCCEEDED for order #{order_id}. Amount: $#{'%.2f' % order_totals[:total]}."
       update_inventory
       generate_order_summary
       send_confirmation_email
@@ -95,7 +95,7 @@ class OrderProcessor
   def generate_order_summary
     return "Order summary cannot be generated for status: #{@status}" unless @status == :paid
 
-    summary = "Order Summary for Order ID: #{@order_id}\n"
+    summary = "Order Summary for Order ID: #{order_id}\n"
     summary += "Customer: #{@customer.name} (#{@customer.email})\n"
     summary += "Address: #{@customer.address}\n"
     summary += "Status: #{@status}\n"
