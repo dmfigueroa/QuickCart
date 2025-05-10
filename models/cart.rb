@@ -23,13 +23,13 @@ class Cart
   end
 
   def summary
-    summary = "Items:\n"
-    summary += @items.map(&:summary).join("\n")
-    summary += "\n"
-    summary += "Subtotal: $#{format('%.2f', subtotal)}\n"
-    summary += "Tax (7%): $#{format('%.2f', tax)}\n"
-    summary += "Total: $#{format('%.2f', total)}\n"
-    summary
+    result = "Items:\n"
+    result += @items.map(&:summary).join("\n")
+    result += "\n"
+    result += "Subtotal: $#{format('%.2f', subtotal)}\n"
+    result += "Tax (7%): $#{format('%.2f', tax)}\n"
+    result += "Total: $#{format('%.2f', total)}\n"
+    result
   end
 
   private

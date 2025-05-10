@@ -11,9 +11,9 @@ class Customer
   end
 
   def summary
-    summary = "Customer: #{name} (#{email})\n"
-    summary += "Address: #{address}\n"
-    summary
+    result = "Customer: #{name} (#{email})\n"
+    result += "Address: #{address}\n"
+    result
   end
 
   def to_s
