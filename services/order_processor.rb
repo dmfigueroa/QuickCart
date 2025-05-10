@@ -15,7 +15,7 @@ class OrderProcessor
     @cart = Cart.new
     @status = :pending
     @inventory = inventory
-    @id = generate_id
+    @id = generate_order_id
 
     puts "Order #{id} created for #{@customer.name}."
   end
