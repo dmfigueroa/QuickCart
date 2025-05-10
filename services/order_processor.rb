@@ -49,9 +49,7 @@ class OrderProcessor
   end
 
   def send_confirmation_email
-    # Simulate sending an email
-    puts "Simulating sending confirmation email to #{order.customer.email} for order #{order.id}."
-    # In a real app, this would use an email library and templates.
+    EmailSender.new.send_email(order.customer.email, 'Order Confirmation', order.print_summary)
   end
 
   def validate_can_add_items(product, quantity)
