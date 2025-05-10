@@ -25,10 +25,6 @@ class OrderProcessor
     puts "Error: #{e.message}"
   end
 
-  def calculate_total
-    @cart.calculate_total
-  end
-
   def validate_customer_details
     # Basic validation
     if @customer.name.nil? || @customer.name.strip.empty?
@@ -69,8 +65,7 @@ class OrderProcessor
       false
     else
       @status = :paid
-      order_totals = calculate_total
-      puts "Payment SUCCEEDED for order #{order_id}. Amount: $#{'%.2f' % order_totals[:total]}."
+      puts "Payment SUCCEEDED for order #{order_id}. Amount: $#{'%.2f' % @cart.total}."
       update_inventory
       generate_order_summary
       send_confirmation_email
