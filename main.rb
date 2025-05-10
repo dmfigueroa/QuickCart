@@ -3,7 +3,7 @@
 require_relative 'models/inventory'
 require_relative 'models/customer'
 require_relative 'models/card'
-require_relative 'order_processor'
+require_relative 'services/order_processor'
 
 puts "\n--- INITIALIZING INVENTORY ---"
 inventory = Inventory.new

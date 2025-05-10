@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'uri'
-require_relative 'models/cart'
+require_relative '../models/cart'
 
 # Processes customer orders, manages items, calculates totals, and handles payment.
 class OrderProcessor
