@@ -14,19 +14,9 @@ class Cart
     @items << CartItem.new(item, quantity)
   end
 
-  def calculate_total
-    { subtotal:, tax:, total: }
-  end
-
-  def summary
-    "Cart -> #{@items.map(&:to_s).join(', ')}"
-  end
-
   def empty?
     @items.empty?
   end
-
-  private
 
   def subtotal
     @items.sum(&:price)
@@ -38,5 +28,9 @@ class Cart
 
   def total
     subtotal + tax
+  end
+
+  def to_s
+    "  - #{@items.map(&:to_s).join(', ')}"
   end
 end

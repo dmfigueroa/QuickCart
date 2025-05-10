@@ -86,11 +86,10 @@ class OrderProcessor
     summary += "Address: #{@customer.address}\n"
     summary += "Status: #{@status}\n"
     summary += "Items:\n"
-    summary += "#{@cart.summary}\n"
-    totals = calculate_total
-    summary += "Subtotal: $#{'%.2f' % totals[:subtotal]}\n"
-    summary += "Tax (7%): $#{'%.2f' % totals[:tax]}\n"
-    summary += "Total: $#{'%.2f' % totals[:total]}\n"
+    summary += "#{@cart}\n"
+    summary += "Subtotal: $#{'%.2f' % @cart.subtotal}\n"
+    summary += "Tax (7%): $#{'%.2f' % @cart.tax}\n"
+    summary += "Total: $#{'%.2f' % @cart.total}\n"
     summary += "Thank you for your order!\n"
 
     puts "\n--- ORDER SUMMARY (#{order_id}) ---"
