@@ -18,14 +18,6 @@ class Cart
     @items.empty?
   end
 
-  def subtotal
-    @items.sum(&:price)
-  end
-
-  def tax
-    subtotal * 0.07
-  end
-
   def total
     subtotal + tax
   end
@@ -38,5 +30,15 @@ class Cart
     summary += "Tax (7%): $#{format('%.2f', tax)}\n"
     summary += "Total: $#{format('%.2f', total)}\n"
     summary
+  end
+
+  private
+
+  def subtotal
+    @items.sum(&:price)
+  end
+
+  def tax
+    subtotal * 0.07
   end
 end

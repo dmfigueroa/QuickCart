@@ -8,22 +8,23 @@ require_relative 'order_summary_generator'
 
 # Processes customer orders, manages items, calculates totals, and handles payment.
 class OrderProcessor
-  attr_reader :customer, :status, :inventory
+  attr_reader :id, :customer, :status, :inventory
 
   def initialize(inventory, customer)
     @customer = customer
     @cart = Cart.new
     @status = :pending
     @inventory = inventory
+    @id = generate_id
 
-    puts "Order #{order_id} created for #{@customer.name}."
+    puts "Order #{id} created for #{@customer.name}."
   end
 
   def add_item(product, quantity)
     validate_can_add_items(product, quantity)
 
     @cart.add_item(product, quantity)
-    puts "#{quantity} of #{product.name} added to order #{order_id}."
+    puts "#{quantity} of #{product.name} added to order #{id}."
   rescue StandardError => e
     puts "Error: #{e.message}"
   end
@@ -32,29 +33,25 @@ class OrderProcessor
     validate_order(card)
 
     @status = :paid
-    puts "Payment SUCCEEDED for order #{order_id}. Amount: $#{'%.2f' % @cart.total}."
-    update_inventory
+    puts "Payment SUCCEEDED for order #{id}. Amount: $#{format('%.2f', @cart.total)}."
+    process_order
     generate_order_summary
     send_confirmation_email
 
     true
-  rescue StandardError => e
-    puts "Payment failed for order #{order_id}"
+  rescue StandardError
+    puts "Payment failed for order #{id}"
     false
   end
 
   def generate_order_summary
     return "Order summary cannot be generated for status: #{status}" unless paid?
 
-    OrderSummaryGenerator.new.generate(order_id, status, customer, @cart)
+    OrderSummaryGenerator.new.generate(self, customer, @cart)
   end
 
   def paid?
     @status == :paid
-  end
-
-  def order_id
-    @order_id ||= generate_order_id
   end
 
   private
@@ -63,19 +60,13 @@ class OrderProcessor
     "ORD-#{Time.now.to_i}-#{rand(100..999)}"
   end
 
-  def update_inventory
-    puts "Updating inventory for order #{order_id}..."
-    @cart.items.each do |item|
-      if @inventory.items[item.item.id]
-        @inventory.items[item.item.id].stock -= item.quantity
-        puts "  Stock for #{@inventory.items[item.item.id].name} reduced to #{@inventory.items[item.item.id].stock}."
-      end
-    end
+  def process_order
+    @inventory.process_order(id, @cart)
   end
 
   def send_confirmation_email
     # Simulate sending an email
-    puts "Simulating sending confirmation email to #{@customer.email} for order #{order_id}."
+    puts "Simulating sending confirmation email to #{@customer.email} for order #{id}."
     # In a real app, this would use an email library and templates.
   end
 
@@ -105,12 +96,12 @@ class OrderProcessor
     return if valid_customer?
 
     @status = :validation_failed
-    raise StandardError, "Aborted due to validation errors for order #{order_id}."
+    raise StandardError, "Aborted due to validation errors for order #{id}."
   end
 
   def valid_customer?
     is_valid = CustomerValidator.new(customer).validate
-    puts "Customer details validated for order #{order_id}."
+    puts "Customer details validated for order #{id}."
 
     is_valid
   end
@@ -118,11 +109,11 @@ class OrderProcessor
   def validate_cart
     return unless @cart.empty?
 
-    raise "Cannot process payment for an empty order (#{order_id})."
+    raise "Cannot process payment for an empty order (#{id})."
   end
 
   def validate_payment(card)
-    PaymentProcessor.new(order_id, card).process_payment
+    PaymentProcessor.new(id, card).process_payment
   rescue StandardError => e
     @status = :payment_failed
     raise e.message

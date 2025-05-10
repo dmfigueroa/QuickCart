@@ -18,7 +18,21 @@ class Inventory
     items[item_code]
   end
 
+  def process_order(order_id, cart)
+    puts "Updating inventory for order #{order_id}..."
+
+    cart.items.each(&method(:update_item_stock))
+  end
+
   def to_s
     items.map { |id, item_object| "  #{id}: #{item_object}" }.join("\n")
+  end
+
+  private
+
+  def update_item_stock(cart_item)
+    item = items[cart_item.id]
+    item.stock -= cart_item.quantity
+    puts "  Stock for #{item.name} reduced to #{item.stock}."
   end
 end

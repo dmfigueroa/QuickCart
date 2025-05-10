@@ -2,14 +2,14 @@
 
 # Generates a summary of an order.
 class OrderSummaryGenerator
-  def generate(order_id, status, customer, cart)
-    summary = "Order Summary for Order ID: #{order_id}\n"
+  def generate(order, customer, cart)
+    summary = "Order Summary for Order ID: #{order.id}\n"
     summary += customer.summary
-    summary += "Status: #{status}\n"
+    summary += "Status: #{order.status}\n"
     summary += cart.summary
     summary += "Thank you for your order!\n"
 
-    puts "\n--- ORDER SUMMARY (#{order_id}) ---"
+    puts "\n--- ORDER SUMMARY (#{order.id}) ---"
     puts summary
     puts "---------------------------\n"
     summary

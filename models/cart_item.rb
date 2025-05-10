@@ -9,6 +9,10 @@ class CartItem
     @quantity = quantity
   end
 
+  def id
+    item.id
+  end
+
   def price
     item.price(quantity)
   end
