@@ -10,10 +10,8 @@ inventory = Inventory.new
 puts inventory
 puts "------------------------------\n"
 
-puts "\n------ ADDING CUSTOMER -------"
 customer1 = Customer.new({ name: 'John Doe', email: 'john.doe@example.com', address: '123 Main St, Anytown, USA' })
 puts customer1
-puts "------------------------------\n\n"
 
 order1 = OrderProcessor.new(inventory, customer1)
 order1.add_item(inventory.find_item('ITEM001'), 2)
@@ -26,20 +24,17 @@ else
   puts 'Order 1 processing failed.'
 end
 
-puts "\nUpdated Inventory: \n#{inventory}"
+puts "\nUpdated Inventory: \n#{inventory}\n\n"
 
-puts "\n------ ADDING CUSTOMER -------"
 customer2 = Customer.new({
                            name: 'Jane Smith',
                            email: 'jane.smith@example.com',
                            address: '456 Oak Ave, Otherville, USA'
                          })
-puts customer2
-puts "------------------------------\n"
 
 order2 = OrderProcessor.new(inventory, customer2)
 order2.add_item(inventory.find_item('ITEM002'), 1) # Mega Gadget
 card2 = Card.new('INVALID_CARD_NUMBER', '01/24', '456')
 order2.process_payment(card2) # This will fail
 
-puts "\nFinal Inventory: \n#{inventory}"
+puts "\nFinal Inventory: \n#{inventory}\n\n"
