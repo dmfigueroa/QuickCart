@@ -13,7 +13,7 @@ class CartItem
     item.price(quantity)
   end
 
-  def to_s
-    "#{item.name} x #{quantity}"
+  def summary
+    "  - #{item.name} (Code: #{item.id}) x #{quantity} @ $#{item.price} each"
   end
 end

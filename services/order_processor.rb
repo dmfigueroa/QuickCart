@@ -4,6 +4,8 @@ require 'uri'
 require_relative '../models/cart'
 require_relative 'customer_validator'
 require_relative 'payment_processor'
+require_relative 'order_summary_generator'
+
 # Processes customer orders, manages items, calculates totals, and handles payment.
 class OrderProcessor
   attr_reader :customer, :status, :inventory
@@ -37,35 +39,25 @@ class OrderProcessor
 
     true
   rescue StandardError => e
-    puts "Payment failed: #{e.message}"
+    puts "Payment failed for order #{order_id}"
     false
   end
 
   def generate_order_summary
-    return "Order summary cannot be generated for status: #{@status}" unless @status == :paid
+    return "Order summary cannot be generated for status: #{status}" unless paid?
 
-    summary = "Order Summary for Order ID: #{order_id}\n"
-    summary += "Customer: #{@customer.name} (#{@customer.email})\n"
-    summary += "Address: #{@customer.address}\n"
-    summary += "Status: #{@status}\n"
-    summary += "Items:\n"
-    summary += "#{@cart}\n"
-    summary += "Subtotal: $#{'%.2f' % @cart.subtotal}\n"
-    summary += "Tax (7%): $#{'%.2f' % @cart.tax}\n"
-    summary += "Total: $#{'%.2f' % @cart.total}\n"
-    summary += "Thank you for your order!\n"
-
-    puts "\n--- ORDER SUMMARY (#{order_id}) ---"
-    puts summary
-    puts "---------------------------\n"
-    summary
+    OrderSummaryGenerator.new.generate(order_id, status, customer, @cart)
   end
 
-  private
+  def paid?
+    @status == :paid
+  end
 
   def order_id
     @order_id ||= generate_order_id
   end
+
+  private
 
   def generate_order_id
     "ORD-#{Time.now.to_i}-#{rand(100..999)}"

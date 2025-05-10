@@ -30,9 +30,13 @@ class Cart
     subtotal + tax
   end
 
-  def to_s
-    @items.map do |item|
-      "  - #{item.item.name} (Code: #{item.item.id}) x #{item.quantity} @ $#{item.item.price} each"
-    end.join("\n")
+  def summary
+    summary = "Items:\n"
+    summary += @items.map(&:summary).join("\n")
+    summary += "\n"
+    summary += "Subtotal: $#{format('%.2f', subtotal)}\n"
+    summary += "Tax (7%): $#{format('%.2f', tax)}\n"
+    summary += "Total: $#{format('%.2f', total)}\n"
+    summary
   end
 end

@@ -20,6 +20,6 @@ class Item
   end
 
   def to_s
-    "Item -> #{name} (ID: #{id}) has stock of #{stock} for $#{price} each"
+    "#{name} (ID: #{id}) has stock of #{stock} for $#{price} each"
   end
 end

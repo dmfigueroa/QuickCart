@@ -10,6 +10,12 @@ class Customer
     @address = args[:address]
   end
 
+  def summary
+    summary = "Customer: #{name} (#{email})\n"
+    summary += "Address: #{address}\n"
+    summary
+  end
+
   def to_s
     "Customer -> #{name} (Email: #{email}, Address: #{address})"
   end
