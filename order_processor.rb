@@ -4,10 +4,9 @@ require 'uri'
 
 # Processes customer orders, manages items, calculates totals, and handles payment.
 class OrderProcessor
-  attr_reader :order_id, :customer, :items, :status, :inventory
+  attr_reader :customer, :items, :status, :inventory
 
   def initialize(inventory, customer)
-    @order_id = generate_order_id
     @customer = customer
     @items = [] # Each item: { item: product_info, quantity: quantity }
     @status = :pending
@@ -110,7 +109,7 @@ class OrderProcessor
     summary += "Total: $#{'%.2f' % totals[:total]}\n"
     summary += "Thank you for your order!\n"
 
-    puts "\n--- ORDER SUMMARY (#{@order_id}) ---"
+    puts "\n--- ORDER SUMMARY (#{order_id}) ---"
     puts summary
     puts "---------------------------\n"
     summary
@@ -118,12 +117,16 @@ class OrderProcessor
 
   private
 
+  def order_id
+    @order_id ||= generate_order_id
+  end
+
   def generate_order_id
-    "ORD#{Time.now.to_i}#{rand(100..999)}"
+    "ORD-#{Time.now.to_i}-#{rand(100..999)}"
   end
 
   def update_inventory
-    puts "Updating inventory for order #{@order_id}..."
+    puts "Updating inventory for order #{order_id}..."
     @items.each do |item|
       if @inventory.items[item[:item_code]]
         @inventory.items[item[:item_code]].stock -= item[:quantity]
@@ -134,7 +137,7 @@ class OrderProcessor
 
   def send_confirmation_email
     # Simulate sending an email
-    puts "Simulating sending confirmation email to #{@customer.email} for order #{@order_id}."
+    puts "Simulating sending confirmation email to #{@customer.email} for order #{order_id}."
     # In a real app, this would use an email library and templates.
   end
 end
