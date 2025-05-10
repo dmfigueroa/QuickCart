@@ -1,16 +1,18 @@
 # frozen_string_literal: true
 
 require 'uri'
+require_relative 'models/cart'
 
 # Processes customer orders, manages items, calculates totals, and handles payment.
 class OrderProcessor
-  attr_reader :customer, :items, :status, :inventory
+  attr_reader :customer, :status, :inventory
 
   def initialize(inventory, customer)
     @customer = customer
-    @items = [] # Each item: { item: product_info, quantity: quantity }
+    @cart = Cart.new
     @status = :pending
     @inventory = inventory
+
     puts "Order #{order_id} created for #{@customer.name}."
   end
 
@@ -30,16 +32,13 @@ class OrderProcessor
       return false
     end
 
-    @items << { item: product_info, quantity: quantity }
+    @cart.add_item(product_info, quantity)
     puts "#{quantity} of #{product_info.name} added to order #{order_id}."
     true
   end
 
   def calculate_total
-    subtotal = @items.sum { |item| item[:item].price * item[:quantity] }
-    tax = subtotal * 0.07 # 7% sales tax
-    total = subtotal + tax
-    { subtotal: subtotal, tax: tax, total: total }
+    @cart.calculate_total
   end
 
   def validate_customer_details
@@ -67,7 +66,7 @@ class OrderProcessor
       return false
     end
 
-    if @items.empty?
+    if @cart.empty?
       puts "Error: Cannot process payment for an empty order (#{order_id})."
       return false
     end
@@ -99,10 +98,7 @@ class OrderProcessor
     summary += "Address: #{@customer.address}\n"
     summary += "Status: #{@status}\n"
     summary += "Items:\n"
-    @items.each do |item|
-      product_name = item[:item].name
-      summary += "  - #{product_name} (Code: #{item[:item].id}) x #{item[:quantity]} @ $#{'%.2f' % item[:item].price} each\n"
-    end
+    summary += @cart.summary
     totals = calculate_total
     summary += "Subtotal: $#{'%.2f' % totals[:subtotal]}\n"
     summary += "Tax (7%): $#{'%.2f' % totals[:tax]}\n"
@@ -127,10 +123,10 @@ class OrderProcessor
 
   def update_inventory
     puts "Updating inventory for order #{order_id}..."
-    @items.each do |item|
-      if @inventory.items[item[:item_code]]
-        @inventory.items[item[:item_code]].stock -= item[:quantity]
-        puts "  Stock for #{@inventory.items[item[:item_code]].name} reduced to #{@inventory.items[item[:item_code]].stock}."
+    @cart.items.each do |item|
+      if @inventory.items[item[:item].id]
+        @inventory.items[item[:item].id].stock -= item[:quantity]
+        puts "  Stock for #{@inventory.items[item[:item].id].name} reduced to #{@inventory.items[item[:item].id].stock}."
       end
     end
   end
