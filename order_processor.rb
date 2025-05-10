@@ -98,7 +98,7 @@ class OrderProcessor
     summary += "Address: #{@customer.address}\n"
     summary += "Status: #{@status}\n"
     summary += "Items:\n"
-    summary += @cart.summary
+    summary += "#{@cart.summary}\n"
     totals = calculate_total
     summary += "Subtotal: $#{'%.2f' % totals[:subtotal]}\n"
     summary += "Tax (7%): $#{'%.2f' % totals[:tax]}\n"
@@ -124,9 +124,9 @@ class OrderProcessor
   def update_inventory
     puts "Updating inventory for order #{order_id}..."
     @cart.items.each do |item|
-      if @inventory.items[item[:item].id]
-        @inventory.items[item[:item].id].stock -= item[:quantity]
-        puts "  Stock for #{@inventory.items[item[:item].id].name} reduced to #{@inventory.items[item[:item].id].stock}."
+      if @inventory.items[item.item.id]
+        @inventory.items[item.item.id].stock -= item.quantity
+        puts "  Stock for #{@inventory.items[item.item.id].name} reduced to #{@inventory.items[item.item.id].stock}."
       end
     end
   end

@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative 'cart_item'
+
 # Represents a shopping cart that holds items.
 class Cart
   attr_reader :items
@@ -9,19 +11,15 @@ class Cart
   end
 
   def add_item(item, quantity)
-    @items << { item: item, quantity: quantity }
+    @items << CartItem.new(item, quantity)
   end
 
   def calculate_total
-    {
-      subtotal: subtotal,
-      tax: tax,
-      total: total
-    }
+    { subtotal:, tax:, total: }
   end
 
   def summary
-    "Cart -> #{@items.map { |item| "#{item[:item].name} x #{item[:quantity]}" }.join(', ')}"
+    "Cart -> #{@items.map(&:to_s).join(', ')}"
   end
 
   def empty?
@@ -31,7 +29,7 @@ class Cart
   private
 
   def subtotal
-    @items.sum { |item| item[:item].price * item[:quantity] }
+    @items.sum(&:price)
   end
 
   def tax

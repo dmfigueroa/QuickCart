@@ -2,13 +2,17 @@
 
 # Represents an item in the inventory.
 class Item
-  attr_accessor :id, :name, :price, :stock
+  attr_accessor :id, :name, :stock
 
   def initialize(id, args)
     @id = id
     @name = args[:name]
     @price = args[:price]
     @stock = args[:stock]
+  end
+
+  def price(quantity = 1)
+    @price * quantity
   end
 
   def to_s
