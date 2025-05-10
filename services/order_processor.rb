@@ -16,25 +16,13 @@ class OrderProcessor
     puts "Order #{order_id} created for #{@customer.name}."
   end
 
-  def add_item(product_info, quantity)
-    if status != :pending && status != :payment_failed
-      puts 'Error: Cannot add items to an order that is not pending or has failed payment.'
-      return false
-    end
+  def add_item(product, quantity)
+    validate_can_add_items(product, quantity)
 
-    if product_info.nil?
-      puts "Error: Item code #{product_info.id} not found."
-      return false
-    end
-
-    if product_info.stock < quantity
-      puts "Error: Insufficient stock for #{product_info.name}. Available: #{product_info.stock}, Requested: #{quantity}."
-      return false
-    end
-
-    @cart.add_item(product_info, quantity)
-    puts "#{quantity} of #{product_info.name} added to order #{order_id}."
-    true
+    @cart.add_item(product, quantity)
+    puts "#{quantity} of #{product.name} added to order #{order_id}."
+  rescue StandardError => e
+    puts "Error: #{e.message}"
   end
 
   def calculate_total
@@ -135,5 +123,21 @@ class OrderProcessor
     # Simulate sending an email
     puts "Simulating sending confirmation email to #{@customer.email} for order #{order_id}."
     # In a real app, this would use an email library and templates.
+  end
+
+  def can_modify_order?
+    @status == :pending || @status == :payment_failed
+  end
+
+  def validate_can_add_items(product, quantity)
+    raise 'Cannot add items to an order that is not pending or has failed payment.' unless can_modify_order?
+
+    raise 'Item not found.' if product.nil?
+
+    unless product.in_stock?(quantity)
+      raise "Insufficient stock for #{product.name}. Available: #{product.stock}, Requested: #{quantity}."
+    end
+
+    true
   end
 end
